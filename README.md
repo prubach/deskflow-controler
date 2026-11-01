@@ -36,7 +36,7 @@ You can override the defaults with environment variables, e.g. `SSID=Lupus SERVE
 
 ## Run it at login
 
-```mkdir -p ~/.config/systemd/user ~/bin
+```mkdir -p ~/.config/systemd/user ~/bin ~/.local/state/deskflow-watch
 cp deskflow-watch.sh ~/bin/          # yoga: deskflow-yoga-watch.sh
 
 cat > ~/.config/systemd/user/deskflow-watch.service <<'EOF'
@@ -49,10 +49,16 @@ PartOf=graphical-session.target
 ExecStart=%h/bin/deskflow-watch.sh
 Restart=on-failure
 RestartSec=5
+StandardOutput=append:%h/.local/state/deskflow-watch/watch.log
+StandardError=append:%h/.local/state/deskflow-watch/watch.log
+Environment=APP_LOG=%h/.local/state/deskflow-watch/app.log
 
 [Install]
 WantedBy=graphical-session.target
 EOF
 
 systemctl --user daemon-reload
-systemctl --user enable --now deskflow-watch.service```
+systemctl --user enable --now deskflow-watch.service
+```
+
+Logs: `~/.local/state/deskflow-watch/watch.log` (watcher) and `app.log` (Deskflow start errors).
