@@ -32,3 +32,27 @@ You can override the defaults with environment variables, e.g. `SSID=Lupus SERVE
 
 - **Assumption:** I assumed yoga runs Linux with NetworkManager. If it's Windows or macOS, tell me and I'll adapt it.
 - **Server name:** `zalman` must resolve from yoga. If it doesn't, set `SERVER` to its hostname or IP.
+
+
+## Run it at login
+
+```mkdir -p ~/.config/systemd/user ~/bin
+cp deskflow-watch.sh ~/bin/          # yoga: deskflow-yoga-watch.sh
+
+cat > ~/.config/systemd/user/deskflow-watch.service <<'EOF'
+[Unit]
+Description=Restart Deskflow on monitor/network changes
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+ExecStart=%h/bin/deskflow-watch.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=graphical-session.target
+EOF
+
+systemctl --user daemon-reload
+systemctl --user enable --now deskflow-watch.service```
